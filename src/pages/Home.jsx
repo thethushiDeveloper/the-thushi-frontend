@@ -95,9 +95,7 @@ const JewelrySlider = ({ slides }) => {
   useEffect(() => {
     if (slides.length < 2) return;
     const interval = setInterval(() => {
-      // Check if user is hovering over the slider container
-      const isHovering = document.querySelector('.vjslider-root:hover');
-      if (!isHovering && !animating) {
+      if (!animating) {
         change(1);
       }
     }, 5000); // 5 seconds
