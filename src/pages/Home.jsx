@@ -100,6 +100,8 @@ const JewelrySlider = ({ slides }) => {
 
   return (
     <div className="vjslider-root">
+      <div className="vjslider-grain"></div>
+
       {/* Background blobs */}
       {slides.map((slide, idx) => {
         const attr = getAttr(idx);
@@ -116,7 +118,7 @@ const JewelrySlider = ({ slides }) => {
       })}
 
       <button className="vjslider-btn vjslider-btn--prev" onClick={() => change(-1)} aria-label="Previous slide">
-        <ChevronLeft size={40} strokeWidth={1.5} />
+        <ChevronLeft size={32} strokeWidth={1} />
       </button>
 
       <div className="vjslides__wrapper">
@@ -185,8 +187,29 @@ const JewelrySlider = ({ slides }) => {
       </div>
 
       <button className="vjslider-btn vjslider-btn--next" onClick={() => change(1)} aria-label="Next slide">
-        <ChevronRight size={40} strokeWidth={1.5} />
+        <ChevronRight size={32} strokeWidth={1} />
       </button>
+
+      {/* Pagination dots */}
+      <div className="vjslider-pagination">
+        {slides.map((_, i) => (
+          <button 
+            key={i} 
+            className={`vjslider-dot ${i === current ? 'active' : ''}`}
+            onClick={() => {
+              if (animating) return;
+              const dir = i > current ? 1 : -1;
+              if (i !== current) {
+                setAnimating(true);
+                setCurrent(i);
+                setPrev((i - 1 + slides.length) % slides.length);
+                setNext((i + 1) % slides.length);
+                setTimeout(() => setAnimating(false), 850);
+              }
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 };
@@ -345,7 +368,7 @@ const Home = () => {
       {showJewelrySlider && (
         <section className="vjslider-section">
           <div className="vjslider-section__title">
-            <h2>Our Collection</h2>
+            <h2>OUR COLLECTION</h2>
             <div className="underline"></div>
           </div>
           <JewelrySlider slides={settings.jewelrySlides} />
