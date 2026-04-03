@@ -1,0 +1,281 @@
+.floating-notepad-wrapper {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 1000;
+  font-family: inherit;
+}
+
+.floating-btn {
+  background: var(--primary-color);
+  color: var(--bg-color);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.floating-btn:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background: var(--text-color);
+}
+
+.dark-theme .floating-btn:hover {
+  background: var(--text-color);
+  color: var(--bg-color);
+}
+
+.notepad-modal {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 320px;
+  max-width: calc(100vw - 2rem);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notepad-header {
+  background: var(--secondary-bg);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notepad-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.notepad-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.delete-all-btn {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.delete-all-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.04);
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  opacity: 0.7;
+}
+
+.close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  opacity: 1;
+}
+
+.dark-theme .close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.notepad-body {
+  padding: 1rem;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.notepad-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.notepad-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row-number {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  width: 20px;
+}
+
+.notepad-input {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.notepad-input:focus {
+  border-color: var(--primary-color);
+}
+
+.item-no-input {
+  flex: 1;
+  min-width: 0;
+  /* needed for input inside flex to shrink properly */
+}
+
+.qty-input {
+  width: 60px;
+  text-align: center;
+}
+
+.delete-row-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.delete-row-btn:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.delete-row-btn:disabled {
+  color: var(--text-color);
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.add-row-btn {
+  background: transparent;
+  border: 1px dashed var(--border-color);
+  color: var(--text-color);
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.add-row-btn:hover {
+  background: var(--secondary-bg);
+  border-color: var(--primary-color);
+}
+
+.notepad-footer {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 0.5rem;
+  background: var(--secondary-bg);
+}
+
+.action-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
+
+.copy-btn {
+  background: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.copy-btn:hover {
+  background: var(--bg-color);
+  filter: brightness(0.95);
+}
+
+.dark-theme .copy-btn:hover {
+  filter: brightness(1.2);
+}
+
+.whatsapp-btn {
+  background: #25D366;
+  /* WhatsApp green */
+  color: white;
+}
+
+/* Mobile responsive adjustments */
+@media screen and (max-width: 768px) {
+  .floating-notepad-wrapper {
+    bottom: 1rem;
+    left: 1rem;
+  }
+
+  .floating-btn {
+    width: 50px;
+    height: 50px;
+  }
+}
