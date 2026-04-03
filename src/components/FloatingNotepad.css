@@ -262,9 +262,22 @@
 }
 
 .whatsapp-btn {
-  background: #25D366;
-  /* WhatsApp green */
-  color: white;
+  background-color: #25D366 !important;
+  /* WhatsApp Official Green */
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-btn:hover {
+  background-color: #128c7e !important;
+  /* Slightly darker green on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
+}
+
+/* Ensure icons are white */
+.whatsapp-btn svg {
+  color: #ffffff !important;
 }
 
 /* Mobile responsive adjustments */
