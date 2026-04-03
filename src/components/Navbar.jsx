@@ -9,7 +9,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('adminToken');
   const [logoUrl, setLogoUrl] = useState('');
-  const [logoDisplayMode, setLogoDisplayMode] = useState('text');
+  const [logoDisplayMode, setLogoDisplayMode] = useState('both');
   const [siteTitle, setSiteTitle] = useState('The Thushi');
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
   const [logoVersion, setLogoVersion] = useState(Date.now());
@@ -62,7 +62,11 @@ const Navbar = () => {
       <div className="nav-container">
         <Link to="/" className="nav-logo">
           {(logoDisplayMode === 'image' || logoDisplayMode === 'both') && logoUrl ? (
-            <img src={`${getImageUrl(logoUrl)}?v=${logoVersion}`} alt={`${siteTitle || 'The Thushi'} Logo`} style={{ height: '40px', marginRight: logoDisplayMode === 'both' ? '10px' : '0' }} />
+            <img 
+              src={`${getImageUrl(logoUrl)}?v=${logoVersion}`} 
+              alt={`${siteTitle || 'The Thushi'} Logo`} 
+              style={{ height: '40px', marginRight: '10px' }} 
+            />
           ) : (
             <Diamond className="logo-icon" />
           )}

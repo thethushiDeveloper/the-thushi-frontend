@@ -11,7 +11,7 @@ const Settings = () => {
     whatsappNumber: '',
     heroSubtitle: '',
     aboutMode: 'text',
-    logoDisplayMode: 'text',
+    logoDisplayMode: 'both',
     siteTitle: 'The Thushi',
     globalFont: 'Playfair Display',
     aboutText: '',
