@@ -197,7 +197,7 @@ const Settings = () => {
         newJewelrySlides.forEach(s => formData.append('jewelrySlideImages', s.file));
       }
 
-      await api.put('/settings', formData, {
+      const { data: updatedData } = await api.put('/settings', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMessage('Settings updated successfully!');
@@ -207,8 +207,8 @@ const Settings = () => {
         document.documentElement.style.setProperty('--global-font', settings.globalFont);
       }
       
-      // Dispatch an event to notify Navbar and Footer to update!
-      window.dispatchEvent(new Event('settingsUpdated'));
+      // Dispatch event with fresh data so Navbar/Footer update immediately
+      window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: updatedData }));
       
       fetchSettings();
       setTimeout(() => setMessage(''), 3000);
