@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Plus, Trash2, Eye, EyeOff, Image } from 'lucide-react';
-import api, { BASE_URL } from '../../utils/api';
+import api, { getImageUrl } from '../../utils/api';
 import './Admin.css';
 
 const Settings = () => {
@@ -234,7 +234,7 @@ const Settings = () => {
             <label>Website Logo</label>
             {existingLogo && !deleteLogo && (
               <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px'}}>
-                <img src={`${BASE_URL}${existingLogo}`} alt="Current Logo" style={{height: '50px'}}/>
+                <img src={getImageUrl(existingLogo)} alt="Current Logo" style={{height: '50px'}}/>
                 <button type="button" className="action-btn delete" onClick={() => setDeleteLogo(true)}><Trash2 size={16}/></button>
               </div>
             )}
@@ -281,7 +281,7 @@ const Settings = () => {
               <div style={{display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px'}}>
                 {existingSliders.map((img, idx) => (
                   <div key={idx} style={{position: 'relative'}}>
-                    <img src={`${BASE_URL}${img}`} alt={`Slider ${idx}`} style={{height: '60px', borderRadius: '4px'}}/>
+                    <img src={getImageUrl(img)} alt={`Slider ${idx}`} style={{height: '60px', borderRadius: '4px'}}/>
                     <button type="button" className="action-btn delete" style={{position: 'absolute', top: 0, right: 0, transform: 'translate(50%, -50%)', background: 'red', color: '#fff', border: 'none', borderRadius: '50%', padding: '0.2rem'}} onClick={() => removeSlider(img)}>
                       <Trash2 size={12}/>
                     </button>
@@ -343,7 +343,7 @@ const Settings = () => {
                     <div key={slide._id} style={{display: 'flex', gap: '1rem', alignItems: 'flex-start', padding: '1rem', background: 'var(--bg-color)', borderRadius: '8px', border: '1px solid var(--border-color)', flexWrap: 'wrap'}}>
                       <div style={{position: 'relative', flexShrink: 0}}>
                         <img
-                          src={`${BASE_URL}${slide.image}`}
+                          src={getImageUrl(slide.image)}
                           alt={`Slide ${idx + 1}`}
                           style={{height: '90px', width: '60px', objectFit: 'cover', borderRadius: '4px', display: 'block'}}
                         />
@@ -480,7 +480,7 @@ const Settings = () => {
               <label>About Us Big Image</label>
               {existingAboutImage && !deleteAboutImage && (
                 <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px'}}>
-                  <img src={`${BASE_URL}${existingAboutImage}`} alt="About" style={{height: '100px'}}/>
+                  <img src={getImageUrl(existingAboutImage)} alt="About" style={{height: '100px'}}/>
                   <button type="button" className="action-btn delete" onClick={() => setDeleteAboutImage(true)}><Trash2 size={16}/></button>
                 </div>
               )}

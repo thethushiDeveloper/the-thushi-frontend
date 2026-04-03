@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
-import api from '../utils/api';
+import api, { getImageUrl } from '../utils/api';
 
 const About = () => {
   const [settings, setSettings] = useState(null);
@@ -35,7 +35,7 @@ const About = () => {
       >
         {settings.aboutMode === 'image' && settings.aboutImage ? (
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <img src={`http://localhost:5000${settings.aboutImage}`} alt={`About ${settings.siteTitle || 'The Thushi'}`} style={{ maxWidth: '100%', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }} />
+            <img src={getImageUrl(settings.aboutImage)} alt={`About ${settings.siteTitle || 'The Thushi'}`} style={{ maxWidth: '100%', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }} />
           </div>
         ) : (
           <div style={{ fontSize: '1.2rem', lineHeight: '1.8', color: 'var(--text-color, #e0e0e0)', marginBottom: '3rem', whiteSpace: 'pre-line', textAlign: 'center' }}>

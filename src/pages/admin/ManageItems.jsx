@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Edit3, ImagePlus } from 'lucide-react';
-import api, { BASE_URL } from '../../utils/api';
+import api, { getImageUrl } from '../../utils/api';
 import './Admin.css';
 
 const ManageItems = () => {
@@ -196,7 +196,7 @@ const ManageItems = () => {
               {filteredItems.map(item => (
                 <tr key={item._id}>
                   <td>
-                    <img src={item.images[0] ? `${BASE_URL}${item.images[0]}` : '/placeholder.jpg'} alt={item.name} className="table-img"/>
+                    <img src={item.images[0] ? getImageUrl(item.images[0]) : '/placeholder.jpg'} alt={item.name} className="table-img"/>
                   </td>
                   <td>#{item.itemNumber}</td>
                   <td>{item.name}</td>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, Copy, Check } from 'lucide-react';
-import api, { BASE_URL } from '../utils/api';
+import api, { getImageUrl } from '../utils/api';
 import './Catalog.css';
 
 const Catalog = () => {
@@ -113,7 +113,7 @@ const Catalog = () => {
             >
               <div className="img-wrapper">
                 <img
-                  src={item.images[0] ? `${BASE_URL}${item.images[0]}` : 'https://via.placeholder.com/300x400?text=No+Image'}
+                  src={item.images[0] ? getImageUrl(item.images[0]) : 'https://via.placeholder.com/300x400?text=No+Image'}
                   alt={item.name}
                 />
               </div>

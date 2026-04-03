@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Phone, MessageCircle, ArrowLeft, X, Copy, Check } from 'lucide-react';
-import api, { BASE_URL } from '../utils/api';
+import api, { getImageUrl } from '../utils/api';
 import './ItemDetail.css';
 
 const ItemDetail = () => {
@@ -33,7 +33,7 @@ const ItemDetail = () => {
       const { data } = await api.get(`/items/${id}`);
       setItem(data);
       if (data.images && data.images.length > 0) {
-        setMainImage(`${BASE_URL}${data.images[0]}`);
+        setMainImage(getImageUrl(data.images[0]));
       }
     } catch (error) {
       console.error('Failed to load item detail');
@@ -88,10 +88,10 @@ const ItemDetail = () => {
             {item.images.map((img, i) => (
               <div
                 key={i}
-                className={`thumbnail ${mainImage === `${BASE_URL}${img}` ? 'active' : ''}`}
-                onClick={() => setMainImage(`${BASE_URL}${img}`)}
+                className={`thumbnail ${mainImage === getImageUrl(img) ? 'active' : ''}`}
+                onClick={() => setMainImage(getImageUrl(img))}
               >
-                <img src={`${BASE_URL}${img}`} alt={`Thumbnail ${i}`} />
+                <img src={getImageUrl(img)} alt={`Thumbnail ${i}`} />
               </div>
             ))}
           </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Phone, MessageCircle, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
-import api, { BASE_URL } from '../utils/api';
+import api, { getImageUrl } from '../utils/api';
 import './Home.css';
 
 // ─── Lerp helpers ────────────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ const JewelrySlider = ({ slides }) => {
           <div
             key={`bg-${idx}`}
             className={`vjslide__bg ${attr ? attr : 'vjslide__bg--hidden'}`}
-            style={{ '--bg': `url("${BASE_URL}${slide.image}")` }}
+            style={{ '--bg': `url("${getImageUrl(slide.image)}")` }}
             {...(attr === 'data-current' ? { 'data-current': '' } : {})}
             {...(attr === 'data-next' ? { 'data-next': '' } : {})}
             {...(attr === 'data-previous' ? { 'data-previous': '' } : {})}
@@ -139,7 +139,7 @@ const JewelrySlider = ({ slides }) => {
                   <div className="vjslide--image__wrapper">
                     <img
                       className="vjslide--image"
-                      src={`${BASE_URL}${slide.image}`}
+                      src={getImageUrl(slide.image)}
                       alt={slide.title || `Jewellery slide ${idx + 1}`}
                     />
                   </div>
@@ -269,7 +269,7 @@ const Home = () => {
              const foundItem = items.find(i => i.category === cat.name && i.images && i.images.length > 0);
              return {
                ...cat,
-               image: foundItem ? `${BASE_URL}${foundItem.images[0]}` : null
+               image: foundItem ? getImageUrl(foundItem.images[0]) : null
              };
           });
           setAllCategories(categoryData);
@@ -308,7 +308,8 @@ const Home = () => {
   const getBackgroundImage = () => {
     if (settings && settings.sliders && settings.sliders.length > 0) {
       const slideIndex = currentSlide % settings.sliders.length;
-      return `url("${BASE_URL}${settings.sliders[slideIndex]}")`;
+      return `url("${getImageUrl(settings.sliders[slideIndex])}")`;
+
     }
     return `url("${defaultSlider}")`;
   };
@@ -410,7 +411,7 @@ const Home = () => {
             >
               <div className="card-image-wrapper">
                 <img
-                  src={item.images[0] ? `${BASE_URL}${item.images[0]}` : 'https://via.placeholder.com/300x400?text=No+Image'}
+                  src={item.images[0] ? getImageUrl(item.images[0]) : 'https://via.placeholder.com/300x400?text=No+Image'}
                   alt={item.name}
                   className="card-image"
                 />

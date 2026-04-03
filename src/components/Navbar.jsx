@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Diamond, Sun, Moon } from 'lucide-react';
-import api from '../utils/api';
+import api, { getImageUrl } from '../utils/api';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -51,7 +51,7 @@ const Navbar = () => {
       <div className="nav-container">
         <Link to="/" className="nav-logo">
           {(logoDisplayMode === 'image' || logoDisplayMode === 'both') && logoUrl ? (
-            <img src={`http://localhost:5000${logoUrl}`} alt={`${siteTitle || 'The Thushi'} Logo`} style={{ height: '40px', marginRight: logoDisplayMode === 'both' ? '10px' : '0' }} />
+            <img src={getImageUrl(logoUrl)} alt={`${siteTitle || 'The Thushi'} Logo`} style={{ height: '40px', marginRight: logoDisplayMode === 'both' ? '10px' : '0' }} />
           ) : (
             <Diamond className="logo-icon" />
           )}
