@@ -88,8 +88,21 @@ const JewelrySlider = ({ slides }) => {
       setNext((nc + 1) % total);
       return nc;
     });
-    setTimeout(() => setAnimating(false), 850);
+    setTimeout(() => setAnimating(false), 900);
   }, [animating, slides.length]);
+
+  // --- Auto scroll effect ---
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const interval = setInterval(() => {
+      // Check if user is hovering over the slider container
+      const isHovering = document.querySelector('.vjslider-root:hover');
+      if (!isHovering && !animating) {
+        change(1);
+      }
+    }, 5000); // 5 seconds
+    return () => clearInterval(interval);
+  }, [change, animating, slides.length]);
 
   const getAttr = (idx) => {
     if (idx === current) return 'data-current';
