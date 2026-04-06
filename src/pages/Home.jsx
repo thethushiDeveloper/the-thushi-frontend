@@ -410,7 +410,7 @@ const Home = () => {
               {allCategories.map(cat => (
                 <Link to={`/catalog?category=${encodeURIComponent(cat.name)}`} key={cat._id} className="category-card">
                   <div className="category-image-wrapper">
-                    <img src={cat.image} alt={cat.name} className="category-image" />
+                    <img src={cat.image} alt={`${cat.name} Jewellery Category`} className="category-image" loading="lazy" />
                   </div>
                   <h3 className="category-name">{cat.name}</h3>
                 </Link>
@@ -446,8 +446,9 @@ const Home = () => {
               <div className="card-image-wrapper">
                 <img
                   src={item.images[0] ? getImageUrl(item.images[0]) : 'https://via.placeholder.com/300x400?text=No+Image'}
-                  alt={item.name}
+                  alt={`${item.name} - Featured ${item.category} ${item.metal || 'Gold'} Jewellery`}
                   className="card-image"
+                  loading="lazy"
                 />
               </div>
               <div className="card-info">

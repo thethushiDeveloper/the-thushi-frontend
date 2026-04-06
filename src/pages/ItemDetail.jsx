@@ -35,6 +35,15 @@ const ItemDetail = () => {
       if (data.images && data.images.length > 0) {
         setMainImage(getImageUrl(data.images[0]));
       }
+      
+      // Dynamic SEO update
+      if (data) {
+        document.title = `${data.name} | The Thushi Jewellery`;
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+          metaDescription.setAttribute('content', `Buy ${data.name} - ${data.description || 'Exquisite jewellery from our collection'}. Item No: ${data.itemNumber}.`);
+        }
+      }
     } catch (error) {
       console.error('Failed to load item detail');
     }
@@ -82,7 +91,7 @@ const ItemDetail = () => {
             key={mainImage}
             onClick={() => setIsZoomed(true)}
           >
-            <img src={mainImage} alt={item.name} className="main-image" />
+            <img src={mainImage} alt={`${item.name} - ${item.category} ${item.metal || 'Gold'} Jewellery`} className="main-image" />
           </motion.div>
           <div className="thumbnail-list">
             {item.images.map((img, i) => (
@@ -91,7 +100,7 @@ const ItemDetail = () => {
                 className={`thumbnail ${mainImage === getImageUrl(img) ? 'active' : ''}`}
                 onClick={() => setMainImage(getImageUrl(img))}
               >
-                <img src={getImageUrl(img)} alt={`Thumbnail ${i}`} />
+                <img src={getImageUrl(img)} alt={`${item.name} Thumbnail ${i + 1}`} loading="lazy" />
               </div>
             ))}
           </div>
