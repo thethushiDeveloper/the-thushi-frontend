@@ -295,7 +295,7 @@ const Home = () => {
     const fetchFeatured = async () => {
       try {
         const { data: items } = await api.get('/items');
-        setFeatured(items.slice(0, 4));
+        setFeatured(items.slice(0, 6));
         
         try {
           const { data: cats } = await api.get('/categories');
