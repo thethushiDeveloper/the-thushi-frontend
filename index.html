@@ -46,8 +46,101 @@
       "priceRange": "$$$"
     }
   </script>
-</head>
+  <style>
+    /* Prevent printing */
+    @media print {
+      html, body {
+        display: none !important;
+      }
+    }
+    
+    /* Prevent image dragging and selection globally */
+    img {
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -o-user-select: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
 
+    /* Strict blur class for when window loses focus to deter snipping tools */
+    .strict-blur-protection {
+      filter: blur(15px) grayscale(100%);
+      opacity: 0.1;
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
+
+  <script>
+    // Strict Anti-Screenshot & Anti-Save Protections
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Disable Right-Click on everything to be safe, especially images
+      document.addEventListener('contextmenu', (e) => {
+        if (e.target.tagName === 'IMG') {
+          e.preventDefault();
+        }
+      });
+
+      // 2. Disable Image Dragging
+      document.addEventListener('dragstart', (e) => {
+        if (e.target.tagName === 'IMG') {
+          e.preventDefault();
+        }
+      });
+
+      // 3. Disable Keyboard Shortcuts (PrintScreen, Ctrl+P, Ctrl+S, etc.)
+      document.addEventListener('keydown', (e) => {
+        // Print Screen key
+        if (e.key === 'PrintScreen') {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText('Screenshots are disabled.');
+          }
+          e.preventDefault();
+        }
+
+        // Windows/Linux Ctrl combinations
+        if (e.ctrlKey) {
+          const key = e.key.toLowerCase();
+          if (['p', 's', 'u', 'c'].includes(key)) { // Print, Save, View Source, Copy
+            e.preventDefault();
+          }
+        }
+
+        // Mac Command combinations
+        if (e.metaKey) {
+          const key = e.key.toLowerCase();
+          if (['p', 's', 'u', 'c'].includes(key)) {
+            e.preventDefault();
+          }
+          // Mac Screenshot shortcuts Cmd+Shift+3, 4, 5
+          if (e.shiftKey && ['3', '4', '5'].includes(key)) {
+            e.preventDefault();
+          }
+        }
+      });
+
+      // 4. Clipboard protection on PrintScreen keyup 
+      document.addEventListener('keyup', (e) => {
+        if (e.key === 'PrintScreen') {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText('Screenshots are disabled.');
+          }
+        }
+      });
+
+      // 5. Blur the page when the window loses focus (combats Windows Snipping Tool and similar overlays)
+      window.addEventListener('blur', () => {
+        document.body.classList.add('strict-blur-protection');
+      });
+
+      window.addEventListener('focus', () => {
+        document.body.classList.remove('strict-blur-protection');
+      });
+    });
+  </script>
+</head>
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
