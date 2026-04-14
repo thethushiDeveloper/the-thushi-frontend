@@ -444,10 +444,17 @@ const Home = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
               <div className="card-image-wrapper">
+                {/* Blurred Background Image */}
+                <img
+                  className="bg-blur"
+                  src={item.images[0] ? getImageUrl(item.images[0]) : 'https://via.placeholder.com/300x400?text=No+Image'}
+                  alt=""
+                  aria-hidden="true"
+                />
                 <img
                   src={item.images[0] ? getImageUrl(item.images[0]) : 'https://via.placeholder.com/300x400?text=No+Image'}
                   alt={`${item.name} - Featured ${item.category} ${item.metal || 'Gold'} Jewellery`}
-                  className="card-image"
+                  className="card-image main-img"
                   loading="lazy"
                 />
               </div>

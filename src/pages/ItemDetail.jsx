@@ -91,7 +91,17 @@ const ItemDetail = () => {
             key={mainImage}
             onClick={() => setIsZoomed(true)}
           >
-            <img src={mainImage} alt={`${item.name} - ${item.category} ${item.metal || 'Gold'} Jewellery`} className="main-image" />
+            <img 
+              src={mainImage} 
+              alt="" 
+              className="bg-blur" 
+              aria-hidden="true" 
+            />
+            <img 
+              src={mainImage} 
+              alt={`${item.name} - ${item.category} ${item.metal || 'Gold'} Jewellery`} 
+              className="main-image" 
+            />
           </motion.div>
           <div className="thumbnail-list">
             {item.images.map((img, i) => (
