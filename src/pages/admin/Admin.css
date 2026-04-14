@@ -178,3 +178,43 @@
 @media screen and (max-width: 768px) {
   .form-row { grid-template-columns: 1fr; gap: 0; }
 }
+
+/* Zoom Modal Styles */
+.zoom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  cursor: zoom-out;
+}
+
+.zoomed-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  cursor: default;
+}
+
+.close-zoom {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 10001;
+  transition: color 0.3s;
+}
+
+.close-zoom:hover {
+  color: var(--primary-color);
+}

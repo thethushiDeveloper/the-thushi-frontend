@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Edit3, ImagePlus } from 'lucide-react';
+import { Trash2, Edit3, ImagePlus, X } from 'lucide-react';
 import api, { getImageUrl } from '../../utils/api';
 import './Admin.css';
 
@@ -10,6 +10,8 @@ const ManageItems = () => {
   const [formData, setFormData] = useState({ itemNumber: '', name: '', description: '', weightRange: '', category: 'General', metal: 'Gold' });
   const [images, setImages] = useState(null);
   const [existingImages, setExistingImages] = useState([]);
+  const [imagesToRemove, setImagesToRemove] = useState([]);
+  const [zoomModalImg, setZoomModalImg] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [message, setMessage] = useState('');
   const [categories, setCategories] = useState(['General', 'Necklace', 'Ring', 'Bracelet', 'Earrings']);
@@ -63,6 +65,9 @@ const ManageItems = () => {
         data.append('images', images[i]);
       }
     }
+    if (imagesToRemove.length > 0) {
+      data.append('imagesToRemove', JSON.stringify(imagesToRemove));
+    }
 
     try {
       if (editingId) {
@@ -75,6 +80,7 @@ const ManageItems = () => {
       setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold' });
       setImages(null);
       setExistingImages([]);
+      setImagesToRemove([]);
       setEditingId(null);
       fetchItems();
       setTimeout(() => setMessage(''), 3000);
@@ -88,7 +94,14 @@ const ManageItems = () => {
     setEditingId(item._id);
     setFormData({ itemNumber: item.itemNumber, name: item.name, description: item.description, weightRange: item.weightRange, category: item.category || (categories[0] || 'General'), metal: item.metal || 'Gold' });
     setExistingImages(item.images || []);
+    setImagesToRemove([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleRemoveExistingImage = (imgToRemove, e) => {
+    e.stopPropagation();
+    setExistingImages(prev => prev.filter(img => img !== imgToRemove));
+    setImagesToRemove(prev => [...prev, imgToRemove]);
   };
 
   const deleteItem = async (id) => {
@@ -164,7 +177,10 @@ const ManageItems = () => {
             {editingId && existingImages.length > 0 && (
               <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
                 {existingImages.map((img, idx) => (
-                  <img key={idx} src={getImageUrl(img)} alt="Existing" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-color)' }} />
+                  <div key={idx} style={{ position: 'relative', cursor: 'zoom-in' }} onClick={() => setZoomModalImg(getImageUrl(img))}>
+                    <img src={getImageUrl(img)} alt="Existing" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-color)' }} />
+                    <button type="button" onClick={(e) => handleRemoveExistingImage(img, e)} style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#dc3545', color: 'white', borderRadius: '50%', width: '22px', height: '22px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }} title="Delete Image">X</button>
+                  </div>
                 ))}
               </div>
             )}
@@ -173,7 +189,7 @@ const ManageItems = () => {
             {editingId ? 'Update Item' : 'Add Item'}
           </button>
           {editingId && (
-            <button type="button" className="btn btn-outline" style={{marginLeft: '10px'}} onClick={() => {setEditingId(null); setExistingImages([]); setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold' });}}>
+            <button type="button" className="btn btn-outline" style={{marginLeft: '10px'}} onClick={() => {setEditingId(null); setExistingImages([]); setImagesToRemove([]); setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold' });}}>
               Cancel
             </button>
           )}
@@ -223,6 +239,15 @@ const ManageItems = () => {
           </table>
         </div>
       </div>
+
+      {zoomModalImg && (
+        <div className="zoom-modal" onClick={() => setZoomModalImg(null)}>
+          <button className="close-zoom" onClick={(e) => { e.stopPropagation(); setZoomModalImg(null); }}>
+            <X size={32} />
+          </button>
+          <img src={zoomModalImg} alt="Zoomed" className="zoomed-image" onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
     </div>
   );
 };
