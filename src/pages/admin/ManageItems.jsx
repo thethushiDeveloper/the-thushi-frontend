@@ -9,6 +9,7 @@ const ManageItems = () => {
   const [items, setItems] = useState([]);
   const [formData, setFormData] = useState({ itemNumber: '', name: '', description: '', weightRange: '', category: 'General', metal: 'Gold' });
   const [images, setImages] = useState(null);
+  const [existingImages, setExistingImages] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [message, setMessage] = useState('');
   const [categories, setCategories] = useState(['General', 'Necklace', 'Ring', 'Bracelet', 'Earrings']);
@@ -73,6 +74,7 @@ const ManageItems = () => {
       }
       setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold' });
       setImages(null);
+      setExistingImages([]);
       setEditingId(null);
       fetchItems();
       setTimeout(() => setMessage(''), 3000);
@@ -85,6 +87,8 @@ const ManageItems = () => {
   const editItem = (item) => {
     setEditingId(item._id);
     setFormData({ itemNumber: item.itemNumber, name: item.name, description: item.description, weightRange: item.weightRange, category: item.category || (categories[0] || 'General'), metal: item.metal || 'Gold' });
+    setExistingImages(item.images || []);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const deleteItem = async (id) => {
@@ -155,14 +159,21 @@ const ManageItems = () => {
             <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3"></textarea>
           </div>
           <div className="form-group">
-            <label>Images</label>
+            <label>Images {editingId && '(Select new images to replace existing)'}</label>
             <input type="file" multiple accept="image/*" onChange={handleFileChange} className="file-input" />
+            {editingId && existingImages.length > 0 && (
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+                {existingImages.map((img, idx) => (
+                  <img key={idx} src={getImageUrl(img)} alt="Existing" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-color)' }} />
+                ))}
+              </div>
+            )}
           </div>
           <button type="submit" className="btn btn-primary">
             {editingId ? 'Update Item' : 'Add Item'}
           </button>
           {editingId && (
-            <button type="button" className="btn btn-outline" style={{marginLeft: '10px'}} onClick={() => {setEditingId(null); setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold' });}}>
+            <button type="button" className="btn btn-outline" style={{marginLeft: '10px'}} onClick={() => {setEditingId(null); setExistingImages([]); setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold' });}}>
               Cancel
             </button>
           )}
