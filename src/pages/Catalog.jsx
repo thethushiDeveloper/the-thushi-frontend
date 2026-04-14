@@ -112,7 +112,15 @@ const Catalog = () => {
               transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.5) }}
             >
               <div className="img-wrapper">
+                {/* Blurred Background Image */}
                 <img
+                  className="bg-blur"
+                  src={item.images[0] ? getImageUrl(item.images[0]) : 'https://via.placeholder.com/300x400?text=No+Image'}
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="main-img"
                   src={item.images[0] ? getImageUrl(item.images[0]) : 'https://via.placeholder.com/300x400?text=No+Image'}
                   alt={`${item.name} - ${item.category} ${item.metal || 'Gold'} Jewellery`}
                   loading="lazy"
