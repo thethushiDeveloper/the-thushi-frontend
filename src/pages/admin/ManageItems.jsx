@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Edit3, ImagePlus, X } from 'lucide-react';
+import { Trash2, Edit3, ImagePlus, X, Eye, EyeOff } from 'lucide-react';
 import api, { getImageUrl } from '../../utils/api';
 import './Admin.css';
 
@@ -42,7 +42,7 @@ const ManageItems = () => {
 
   const fetchItems = async () => {
     try {
-      const { data } = await api.get('/items');
+      const { data } = await api.get('/items?admin=true');
       setItems(data);
     } catch (error) {
       console.error('Failed to fetch items');
@@ -112,6 +112,20 @@ const ManageItems = () => {
       } catch (error) {
         console.error('Failed to delete item');
       }
+    }
+  };
+
+  const toggleVisibility = async (item) => {
+    try {
+      const data = new FormData();
+      data.append('isHidden', !item.isHidden);
+      await api.put(`/items/${item._id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setMessage(`Item ${item.isHidden ? 'shown' : 'hidden'} successfully`);
+      fetchItems();
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      setMessage('Error updating item visibility');
+      console.error('Failed to toggle visibility');
     }
   };
 
@@ -230,8 +244,11 @@ const ManageItems = () => {
                   <td>{item.weightRange}</td>
                   <td>{item.metal || 'Gold'}</td>
                   <td>
-                    <button className="action-btn edit" onClick={() => editItem(item)}><Edit3 size={18} /></button>
-                    <button className="action-btn delete" onClick={() => deleteItem(item._id)}><Trash2 size={18} /></button>
+                    <button className="action-btn edit" onClick={() => editItem(item)} title="Edit Item"><Edit3 size={18} /></button>
+                    <button className="action-btn" style={{ color: item.isHidden ? 'var(--text-muted)' : 'var(--primary-color)' }} onClick={() => toggleVisibility(item)} title={item.isHidden ? "Show in Catalog" : "Hide from Catalog"}>
+                      {item.isHidden ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                    <button className="action-btn delete" onClick={() => deleteItem(item._id)} title="Delete Item"><Trash2 size={18} /></button>
                   </td>
                 </tr>
               ))}
