@@ -5,10 +5,16 @@ import { Search, Copy, Check } from 'lucide-react';
 import api, { getImageUrl } from '../utils/api';
 import './Catalog.css';
 
+// Cache to maintain state when navigating to ItemDetail and back
+let cachedItems = [];
+let cachedSearch = '';
+let cachedCategory = '';
+let cachedScroll = 0;
+
 const Catalog = () => {
-  const [items, setItems] = useState([]);
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
+  const [items, setItems] = useState(cachedItems);
+  const [search, setSearch] = useState(cachedSearch);
+  const [category, setCategory] = useState(cachedCategory);
   const [categories, setCategories] = useState(['Necklace', 'Ring', 'Bracelet', 'Earrings']);
   const [copiedId, setCopiedId] = useState(null);
 
@@ -21,6 +27,28 @@ const Catalog = () => {
   };
 
   const location = useLocation();
+
+  useEffect(() => { cachedSearch = search; }, [search]);
+  useEffect(() => { cachedCategory = category; }, [category]);
+  useEffect(() => { cachedItems = items; }, [items]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      cachedScroll = window.scrollY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Restore scroll position when returning to the page
+    if (cachedItems.length > 0) {
+      setTimeout(() => {
+        window.scrollTo(0, cachedScroll);
+      }, 0);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     fetchCategories();
