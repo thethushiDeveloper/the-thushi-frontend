@@ -135,10 +135,27 @@
   margin-bottom: 1rem;
 }
 
+.notepad-item-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notepad-item-container:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
 .notepad-item-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.notepad-item-desc-row {
+  padding-left: 28px; /* Align with inputs, skipping the 20px row number + 8px gap */
 }
 
 .row-number {
@@ -167,6 +184,12 @@
   flex: 1;
   min-width: 0;
   /* needed for input inside flex to shrink properly */
+}
+
+.desc-input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
 }
 
 .qty-input {

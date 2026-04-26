@@ -5,7 +5,7 @@ import './FloatingNotepad.css';
 
 const FloatingNotepad = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [items, setItems] = useState([{ id: Date.now(), itemNo: '', quantity: '' }]);
+  const [items, setItems] = useState([{ id: Date.now(), itemNo: '', quantity: '', description: '' }]);
   const [settings, setSettings] = useState({ whatsappNumber: '' });
   const [copied, setCopied] = useState(false);
 
@@ -26,7 +26,7 @@ const FloatingNotepad = () => {
   }, []);
 
   const handleAddItem = () => {
-    setItems([...items, { id: Date.now(), itemNo: '', quantity: '' }]);
+    setItems([...items, { id: Date.now(), itemNo: '', quantity: '', description: '' }]);
   };
 
   const handleRemoveItem = (id) => {
@@ -40,7 +40,7 @@ const FloatingNotepad = () => {
   };
 
   const handleDeleteAll = () => {
-    setItems([{ id: Date.now(), itemNo: '', quantity: '' }]);
+    setItems([{ id: Date.now(), itemNo: '', quantity: '', description: '' }]);
   };
 
   const generateMessage = () => {
@@ -49,7 +49,8 @@ const FloatingNotepad = () => {
 
     let message = "Hello, I would like to place an order for the following items:\n\n";
     validItems.forEach((item, index) => {
-      message += `${index + 1}. Item No: ${item.itemNo} - Quantity: ${item.quantity || 1}\n`;
+      let descStr = item.description ? ` - Desc: ${item.description.trim()}` : '';
+      message += `${index + 1}. Item No: ${item.itemNo} - Quantity: ${item.quantity || 1}${descStr}\n`;
     });
     message += "\nThank you!";
     return message;
@@ -97,30 +98,41 @@ const FloatingNotepad = () => {
           <div className="notepad-body">
             <div className="notepad-list">
               {items.map((item, index) => (
-                <div key={item.id} className="notepad-item-row">
-                  <span className="row-number">{index + 1}.</span>
-                  <input
-                    type="text"
-                    placeholder="Item No."
-                    value={item.itemNo}
-                    onChange={(e) => handleItemChange(item.id, 'itemNo', e.target.value)}
-                    className="notepad-input item-no-input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Qty"
-                    value={item.quantity}
-                    onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)}
-                    className="notepad-input qty-input"
-                  />
-                  <button 
-                    className="delete-row-btn" 
-                    onClick={() => handleRemoveItem(item.id)}
-                    disabled={items.length === 1}
-                    title="Remove item"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                <div key={item.id} className="notepad-item-container">
+                  <div className="notepad-item-row">
+                    <span className="row-number">{index + 1}.</span>
+                    <input
+                      type="text"
+                      placeholder="Item No."
+                      value={item.itemNo}
+                      onChange={(e) => handleItemChange(item.id, 'itemNo', e.target.value)}
+                      className="notepad-input item-no-input"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Qty"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)}
+                      className="notepad-input qty-input"
+                    />
+                    <button 
+                      className="delete-row-btn" 
+                      onClick={() => handleRemoveItem(item.id)}
+                      disabled={items.length === 1}
+                      title="Remove item"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                  <div className="notepad-item-row notepad-item-desc-row">
+                    <input
+                      type="text"
+                      placeholder="Description (Optional)"
+                      value={item.description || ''}
+                      onChange={(e) => handleItemChange(item.id, 'description', e.target.value)}
+                      className="notepad-input desc-input"
+                    />
+                  </div>
                 </div>
               ))}
             </div>

@@ -46,11 +46,11 @@ const Catalog = () => {
       if (data && data.length > 0) {
         const catNames = data.map(c => c.name);
         setCategories(catNames);
-        
+
         const params = new URLSearchParams(location.search);
         const catQuery = params.get('category');
         if (!catQuery) {
-           setCategory(''); // Auto-select all items
+          setCategory(''); // Auto-select all items
         }
       }
     } catch (error) {
