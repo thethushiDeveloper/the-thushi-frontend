@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Phone, MessageCircle, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
+import { Phone, MessageCircle, ChevronLeft, ChevronRight, Copy, Check, ShoppingBag } from 'lucide-react';
+import { useNotepad } from '../context/NotepadContext';
 import api, { getImageUrl } from '../utils/api';
 import './Home.css';
 
@@ -227,6 +228,7 @@ const JewelrySlider = ({ slides }) => {
 
 // ─── Main Home Component ──────────────────────────────────────────────────────
 const Home = () => {
+  const { addToNotepad } = useNotepad();
   const [featured, setFeatured] = useState([]);
   const [allCategories, setAllCategories] = useState([]);
   const [settings, setSettings] = useState(null);
@@ -235,6 +237,7 @@ const Home = () => {
   
   const phoneNumbers = settings?.phoneNumber ? settings.phoneNumber.split(',').map(n => n.trim()).filter(n => n) : [];
   const [copiedId, setCopiedId] = useState(null);
+  const [addedId, setAddedId] = useState(null);
 
   const handleCopyItemNo = (e, itemNumber, id) => {
     e.preventDefault();
@@ -242,6 +245,14 @@ const Home = () => {
     navigator.clipboard.writeText(itemNumber);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleAddToOrder = (e, item) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToNotepad(item, true);
+    setAddedId(item._id);
+    setTimeout(() => setAddedId(null), 2000);
   };
   const categorySliderRef = useRef(null);
   const catAutoScrollRef = useRef(null);
@@ -470,10 +481,26 @@ const Home = () => {
                   Item No: {item.itemNumber}
                   {copiedId === item._id && <span style={{ color: 'var(--primary-color)', fontWeight: 600 }}> Copied!</span>}
                 </p>
-                <div className="card-actions">
+                <div className="card-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
                   <Link to={`/item/${item._id}`} className="btn btn-outline" style={{ width: '100%', textAlign: 'center' }}>
                     View Details
                   </Link>
+                  <button
+                    type="button"
+                    className={`btn btn-primary add-order-btn ${addedId === item._id ? 'added' : ''}`}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                    onClick={(e) => handleAddToOrder(e, item)}
+                  >
+                    {addedId === item._id ? (
+                      <>
+                        <Check size={16} /> Added to Order!
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag size={16} /> Add for Order
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </motion.div>

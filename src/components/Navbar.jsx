@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Diamond, Sun, Moon } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, X, Diamond, Sun, Moon, Sparkles } from 'lucide-react';
 import api, { getImageUrl } from '../utils/api';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem('adminToken');
+  const [jewellerName, setJewellerName] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [logoDisplayMode, setLogoDisplayMode] = useState('both');
   const [siteTitle, setSiteTitle] = useState('The Thushi');
@@ -22,6 +24,26 @@ const Navbar = () => {
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  // Check Jeweller logged in status
+  useEffect(() => {
+    const checkJeweller = () => {
+      try {
+        const stored = localStorage.getItem('jewellerInfo');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setJewellerName(parsed.name || '');
+        } else {
+          setJewellerName('');
+        }
+      } catch (e) {
+        setJewellerName('');
+      }
+    };
+    checkJeweller();
+    window.addEventListener('jewellerAuthChange', checkJeweller);
+    return () => window.removeEventListener('jewellerAuthChange', checkJeweller);
+  }, [location.pathname]);
 
   const applySettings = (data) => {
     if (!data) return;
@@ -86,6 +108,23 @@ const Navbar = () => {
           </li>
           <li className="nav-item">
             <Link to="/about" className="nav-links" onClick={() => setIsOpen(false)}>About Us</Link>
+          </li>
+          {/* Pro Collection Menu item next to About Us and before Admin */}
+          <li className="nav-item">
+            <Link 
+              to="/pro-collection" 
+              className="nav-links nav-pro-link nav-pro-badge" 
+              onClick={() => setIsOpen(false)}
+              title={jewellerName ? `Pro Collection (${jewellerName})` : 'Exclusive Jewellers Pro Collection'}
+            >
+              <Sparkles size={16} />
+              <span>Pro Collection</span>
+              {jewellerName && (
+                <span style={{ fontSize: '0.75rem', opacity: 0.85, marginLeft: '3px' }}>
+                  • {jewellerName.length > 12 ? `${jewellerName.slice(0, 10)}...` : jewellerName}
+                </span>
+              )}
+            </Link>
           </li>
           {token ? (
             <>

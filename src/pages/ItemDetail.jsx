@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Phone, MessageCircle, ArrowLeft, X, Copy, Check } from 'lucide-react';
+import { Phone, MessageCircle, ArrowLeft, X, Copy, Check, ShoppingBag } from 'lucide-react';
+import { useNotepad } from '../context/NotepadContext';
 import api, { getImageUrl } from '../utils/api';
 import './ItemDetail.css';
 
 const ItemDetail = () => {
+  const { addToNotepad } = useNotepad();
   const { id } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState(null);
@@ -14,11 +16,20 @@ const ItemDetail = () => {
   const [isZoomed, setIsZoomed] = useState(false);
   const [showCallMenu, setShowCallMenu] = useState(false);
   const [itemNoCopied, setItemNoCopied] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   const handleCopyItemNo = () => {
     navigator.clipboard.writeText(item.itemNumber);
     setItemNoCopied(true);
     setTimeout(() => setItemNoCopied(false), 2000);
+  };
+
+  const handleAddToOrder = () => {
+    if (item) {
+      addToNotepad(item, true);
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 2000);
+    }
   };
   
   const phoneNumbers = settings.phoneNumber ? settings.phoneNumber.split(',').map(n => n.trim()).filter(n => n) : [];
@@ -157,6 +168,15 @@ const ItemDetail = () => {
                 )}
               </div>
             )}
+            <button
+              type="button"
+              className={`btn btn-primary add-order-btn ${isAdded ? 'added' : ''}`}
+              onClick={handleAddToOrder}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            >
+              {isAdded ? <Check size={20} /> : <ShoppingBag size={20} />}
+              {isAdded ? 'Added to Order!' : 'Add to Order Notepad'}
+            </button>
             <button className="btn whatsapp-btn" onClick={handleWhatsApp}>
               <MessageCircle size={20} /> WhatsApp Chat
             </button>

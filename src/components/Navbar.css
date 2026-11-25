@@ -36,6 +36,7 @@
 
 .nav-menu {
   display: flex;
+  align-items: center;
   list-style: none;
   text-align: center;
 }
@@ -50,6 +51,29 @@
 
 .nav-links:hover {
   color: var(--primary-color);
+}
+
+.nav-pro-link {
+  color: var(--primary-color) !important;
+  font-weight: 600;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nav-pro-badge {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05));
+  border: 1px solid var(--primary-color);
+  border-radius: 20px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.95rem;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
+}
+
+.nav-pro-badge:hover {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.1));
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
 }
 
 .btn-logout {

@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Edit3, ImagePlus, X, Eye, EyeOff } from 'lucide-react';
+import { Trash2, Edit3, ImagePlus, X, Eye, EyeOff, Sparkles, Filter } from 'lucide-react';
 import api, { getImageUrl } from '../../utils/api';
 import './Admin.css';
 
 const ManageItems = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
-  const [formData, setFormData] = useState({ itemNumber: '', name: '', description: '', weightRange: '', category: 'General', metal: 'Gold' });
+  const [formData, setFormData] = useState({ 
+    itemNumber: '', 
+    name: '', 
+    description: '', 
+    weightRange: '', 
+    category: 'General', 
+    metal: 'Gold',
+    isPro: false
+  });
   const [images, setImages] = useState(null);
   const [existingImages, setExistingImages] = useState([]);
   const [imagesToRemove, setImagesToRemove] = useState([]);
@@ -16,6 +24,7 @@ const ManageItems = () => {
   const [message, setMessage] = useState('');
   const [categories, setCategories] = useState(['General', 'Necklace', 'Ring', 'Bracelet', 'Earrings']);
   const [searchQuery, setSearchQuery] = useState('');
+  const [collectionFilter, setCollectionFilter] = useState('all'); // 'all', 'standard', 'pro'
 
   useEffect(() => {
     if (!localStorage.getItem('adminToken')) navigate('/admin/login');
@@ -50,8 +59,11 @@ const ManageItems = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
   };
 
   const handleFileChange = (e) => setImages(e.target.files);
@@ -77,7 +89,15 @@ const ManageItems = () => {
         await api.post('/items', data, { headers: { 'Content-Type': 'multipart/form-data' } });
         setMessage('Item added successfully');
       }
-      setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold' });
+      setFormData({ 
+        itemNumber: '', 
+        name: '', 
+        description: '', 
+        weightRange: '', 
+        category: categories[0] || 'General', 
+        metal: 'Gold',
+        isPro: false
+      });
       setImages(null);
       setExistingImages([]);
       setImagesToRemove([]);
@@ -92,7 +112,15 @@ const ManageItems = () => {
 
   const editItem = (item) => {
     setEditingId(item._id);
-    setFormData({ itemNumber: item.itemNumber, name: item.name, description: item.description, weightRange: item.weightRange, category: item.category || (categories[0] || 'General'), metal: item.metal || 'Gold' });
+    setFormData({ 
+      itemNumber: item.itemNumber, 
+      name: item.name, 
+      description: item.description || '', 
+      weightRange: item.weightRange, 
+      category: item.category || (categories[0] || 'General'), 
+      metal: item.metal || 'Gold',
+      isPro: item.isPro || false
+    });
     setExistingImages(item.images || []);
     setImagesToRemove([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -129,17 +157,37 @@ const ManageItems = () => {
     }
   };
 
-  const filteredItems = items.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    item.itemNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (item.category && item.category.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const toggleProItem = async (item) => {
+    try {
+      const newProStatus = !item.isPro;
+      const data = new FormData();
+      data.append('isPro', newProStatus);
+      await api.put(`/items/${item._id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setMessage(`Item #${item.itemNumber} moved to ${newProStatus ? 'Pro Collection' : 'Standard Collection'}`);
+      fetchItems();
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      setMessage('Error updating item collection type');
+      console.error('Failed to toggle pro status');
+    }
+  };
+
+  const filteredItems = items.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      item.itemNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.category && item.category.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    if (!matchesSearch) return false;
+    if (collectionFilter === 'pro') return item.isPro === true;
+    if (collectionFilter === 'standard') return !item.isPro;
+    return true;
+  });
 
   return (
     <div className="admin-container animate-fade-in">
       <div className="admin-header">
         <h1>Manage Jewelry Items</h1>
-        <p>Add new pieces or modify existing ones in your catalog.</p>
+        <p>Add new pieces, toggle Pro / Standard collection status, and modify catalog items.</p>
       </div>
 
       {message && <div className="status-message">{message}</div>}
@@ -181,6 +229,80 @@ const ManageItems = () => {
               </select>
             </div>
           </div>
+
+          {/* Slider for Pro / Non-Pro Item */}
+          <div className="form-group" style={{ 
+            background: 'var(--bg-color)', 
+            padding: '1rem', 
+            borderRadius: '8px', 
+            border: `1px solid ${formData.isPro ? 'var(--primary-color)' : 'var(--border-color)'}`,
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+              <label style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sparkles size={18} style={{ color: formData.isPro ? 'var(--primary-color)' : 'var(--text-muted, #888)' }} />
+                <span>Collection Classification Slider</span>
+              </label>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: formData.isPro ? 'var(--primary-color)' : 'var(--text-muted, #aaa)' }}>
+                {formData.isPro ? '💎 Pro Collection (Exclusive)' : 'Non-Pro (Normal Collection)'}
+              </span>
+            </div>
+
+            <div
+              onClick={() => setFormData(prev => ({ ...prev, isPro: !prev.isPro }))}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: formData.isPro ? 'rgba(212, 175, 55, 0.22)' : 'rgba(255, 255, 255, 0.08)',
+                border: `1px solid ${formData.isPro ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                borderRadius: '24px',
+                padding: '3px',
+                cursor: 'pointer',
+                position: 'relative',
+                userSelect: 'none',
+                height: '36px',
+                maxWidth: '320px',
+                transition: 'all 0.3s ease'
+              }}
+              title="Click to toggle between Normal and Pro Collection"
+            >
+              <div style={{
+                position: 'absolute',
+                left: formData.isPro ? 'calc(50% + 2px)' : '3px',
+                top: '3px',
+                width: 'calc(50% - 5px)',
+                height: '28px',
+                background: formData.isPro ? 'var(--primary-color)' : '#666',
+                borderRadius: '20px',
+                transition: 'left 0.25s ease, background 0.25s ease',
+                zIndex: 1
+              }} />
+              <span style={{
+                flex: 1,
+                textAlign: 'center',
+                fontSize: '0.85rem',
+                fontWeight: !formData.isPro ? 700 : 500,
+                color: !formData.isPro ? '#fff' : 'var(--text-muted, #aaa)',
+                zIndex: 2
+              }}>
+                Non-Pro (Standard)
+              </span>
+              <span style={{
+                flex: 1,
+                textAlign: 'center',
+                fontSize: '0.85rem',
+                fontWeight: formData.isPro ? 700 : 500,
+                color: formData.isPro ? '#000' : 'var(--text-muted, #aaa)',
+                zIndex: 2
+              }}>
+                💎 Pro Collection
+              </span>
+            </div>
+            <small style={{ color: 'var(--text-muted, #888)', display: 'block', marginTop: '6px' }}>
+              Items marked as "Pro Collection" are exclusively visible to verified jewellers in the Pro Collection.
+            </small>
+          </div>
+
           <div className="form-group">
             <label>Description</label>
             <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3"></textarea>
@@ -203,7 +325,7 @@ const ManageItems = () => {
             {editingId ? 'Update Item' : 'Add Item'}
           </button>
           {editingId && (
-            <button type="button" className="btn btn-outline" style={{marginLeft: '10px'}} onClick={() => {setEditingId(null); setExistingImages([]); setImagesToRemove([]); setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold' });}}>
+            <button type="button" className="btn btn-outline" style={{marginLeft: '10px'}} onClick={() => {setEditingId(null); setExistingImages([]); setImagesToRemove([]); setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold', isPro: false });}}>
               Cancel
             </button>
           )}
@@ -211,16 +333,77 @@ const ManageItems = () => {
       </div>
 
       <div className="items-list-section">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-          <h2>Current Catalog Items</h2>
-          <input 
-            type="text" 
-            placeholder="Search by name, SKU or category..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ maxWidth: '300px', marginBottom: '0' }}
-          />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h2>Current Catalog Items ({filteredItems.length})</h2>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted, #888)' }}>
+              Click the collection badge to toggle an item between Standard and Pro collection.
+            </p>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* Filter by collection */}
+            <div style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '6px', border: '1px solid var(--border-color)', padding: '2px' }}>
+              <button
+                type="button"
+                onClick={() => setCollectionFilter('all')}
+                style={{
+                  padding: '0.35rem 0.75rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  background: collectionFilter === 'all' ? 'var(--primary-color)' : 'transparent',
+                  color: collectionFilter === 'all' ? '#000' : 'var(--text-color)',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
+              >
+                All ({items.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setCollectionFilter('standard')}
+                style={{
+                  padding: '0.35rem 0.75rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  background: collectionFilter === 'standard' ? 'var(--primary-color)' : 'transparent',
+                  color: collectionFilter === 'standard' ? '#000' : 'var(--text-color)',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Standard ({items.filter(i => !i.isPro).length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setCollectionFilter('pro')}
+                style={{
+                  padding: '0.35rem 0.75rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  background: collectionFilter === 'pro' ? 'var(--primary-color)' : 'transparent',
+                  color: collectionFilter === 'pro' ? '#000' : 'var(--text-color)',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
+              >
+                💎 Pro ({items.filter(i => i.isPro).length})
+              </button>
+            </div>
+
+            <input 
+              type="text" 
+              placeholder="Search by name, SKU or category..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ maxWidth: '260px', marginBottom: '0' }}
+            />
+          </div>
         </div>
+
         <div className="admin-table-container">
           <table className="admin-table">
             <thead>
@@ -229,7 +412,8 @@ const ManageItems = () => {
                 <th>Item No</th>
                 <th>Name</th>
                 <th>Weight</th>
-                <th>Metal</th>
+                <th>Category</th>
+                <th>Collection Type</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -242,7 +426,32 @@ const ManageItems = () => {
                   <td>#{item.itemNumber}</td>
                   <td>{item.name}</td>
                   <td>{item.weightRange}</td>
-                  <td>{item.metal || 'Gold'}</td>
+                  <td>{item.category || 'General'}</td>
+                  <td>
+                    {/* 1-click Pro Slider Badge */}
+                    <button
+                      type="button"
+                      onClick={() => toggleProItem(item)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '0.3rem 0.7rem',
+                        borderRadius: '20px',
+                        border: `1px solid ${item.isPro ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                        background: item.isPro ? 'rgba(212, 175, 55, 0.2)' : 'var(--bg-color)',
+                        color: item.isPro ? 'var(--primary-color)' : 'var(--text-muted, #aaa)',
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      title="Click to toggle between Pro and Standard collection"
+                    >
+                      <Sparkles size={13} />
+                      {item.isPro ? 'PRO Item' : 'Standard'}
+                    </button>
+                  </td>
                   <td>
                     <button className="action-btn edit" onClick={() => editItem(item)} title="Edit Item"><Edit3 size={18} /></button>
                     <button className="action-btn" style={{ color: item.isHidden ? 'var(--text-muted)' : 'var(--primary-color)' }} onClick={() => toggleVisibility(item)} title={item.isHidden ? "Show in Catalog" : "Hide from Catalog"}>

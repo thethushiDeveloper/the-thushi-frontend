@@ -7,8 +7,9 @@
 }
 
 .floating-btn {
+  position: relative;
   background: var(--primary-color);
-  color: var(--bg-color);
+  color: #0d0d0d;
   border: none;
   border-radius: 50%;
   width: 60px;
@@ -16,29 +17,50 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 18px rgba(212, 175, 55, 0.4);
   cursor: pointer;
   transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .floating-btn:hover {
-  transform: scale(1.05) translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  background: var(--text-color);
+  transform: scale(1.08) translateY(-4px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6);
+  background: var(--accent-color);
 }
 
-.dark-theme .floating-btn:hover {
-  background: var(--text-color);
-  color: var(--bg-color);
+.floating-cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  animation: badgePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0); }
+  80% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .notepad-modal {
   background: var(--bg-color);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  width: 320px;
+  width: 370px;
   max-width: calc(100vw - 2rem);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -50,7 +72,6 @@
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -58,45 +79,65 @@
 }
 
 .notepad-header {
-  background: var(--secondary-bg);
-  padding: 1rem;
+  background: var(--secondary-bg, #1a1a1a);
+  padding: 0.85rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
 }
 
-.notepad-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.notepad-header-actions {
+.notepad-title-group {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
+.notepad-header-icon {
+  color: var(--primary-color);
+}
+
+.notepad-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.notepad-count-pill {
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--primary-color);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+}
+
+.notepad-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .delete-all-btn {
   background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.35);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   color: #ef4444;
   cursor: pointer;
-  padding: 4px 10px;
+  padding: 4px 8px;
   border-radius: 6px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.8rem;
+  gap: 4px;
+  font-size: 0.75rem;
   font-weight: 600;
-  transition: background 0.2s, transform 0.15s;
+  transition: all 0.2s;
 }
 
 .delete-all-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  transform: scale(1.04);
+  background: rgba(239, 68, 68, 0.25);
+  transform: scale(1.02);
 }
 
 .close-btn {
@@ -109,37 +150,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
   opacity: 0.7;
+  transition: opacity 0.2s, background 0.2s;
 }
 
 .close-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  opacity: 1;
-}
-
-.dark-theme .close-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
 }
 
 .notepad-body {
   padding: 1rem;
-  max-height: 350px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
 .notepad-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .notepad-item-container {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -148,30 +184,91 @@
   padding-bottom: 0;
 }
 
-.notepad-item-row {
+.notepad-item-main-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+/* Product thumbnail */
+.notepad-thumb-wrap {
+  flex-shrink: 0;
+}
+
+.notepad-thumb {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.notepad-thumb:hover {
+  border-color: var(--primary-color);
+}
+
+.notepad-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-zoom-icon {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border-radius: 3px;
+  padding: 2px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
 }
 
-.notepad-item-desc-row {
-  padding-left: 28px; /* Align with inputs, skipping the 20px row number + 8px gap */
+.notepad-thumb:hover .thumb-zoom-icon {
+  opacity: 1;
 }
 
-.row-number {
-  font-size: 0.9rem;
-  color: var(--text-color);
-  opacity: 0.7;
-  width: 20px;
+.placeholder-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(212, 175, 55, 0.08);
+  cursor: default;
+}
+
+/* Details and inputs */
+.notepad-details-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.notepad-inputs-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .notepad-input {
   background: var(--bg-color);
   border: 1px solid var(--border-color);
   color: var(--text-color);
-  padding: 0.5rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 5px;
+  font-size: 0.88rem;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -183,18 +280,59 @@
 .item-no-input {
   flex: 1;
   min-width: 0;
-  /* needed for input inside flex to shrink properly */
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-.desc-input {
-  flex: 1;
-  width: 100%;
-  min-width: 0;
+/* Quantity Stepper */
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--bg-color);
+}
+
+.qty-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  padding: 4px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--primary-color);
+}
+
+.qty-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .qty-input {
-  width: 60px;
+  width: 38px;
+  padding: 0.35rem 0;
   text-align: center;
+  border: none;
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .delete-row-btn {
@@ -204,21 +342,51 @@
   cursor: pointer;
   padding: 4px;
   opacity: 0.7;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.delete-row-btn:hover:not(:disabled) {
+.delete-row-btn:hover {
   opacity: 1;
+  transform: scale(1.15);
 }
 
-.delete-row-btn:disabled {
+.notepad-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
   color: var(--text-color);
-  opacity: 0.3;
-  cursor: not-allowed;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta-name {
+  font-weight: 600;
+  color: var(--primary-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta-weight {
+  opacity: 0.75;
+}
+
+.desc-input {
+  width: 100%;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.5rem;
+  opacity: 0.9;
+}
+
+.desc-input::placeholder {
+  opacity: 0.55;
+  font-size: 0.75rem;
 }
 
 .add-row-btn {
@@ -226,47 +394,45 @@
   border: 1px dashed var(--border-color);
   color: var(--text-color);
   width: 100%;
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 0.55rem;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   transition: all 0.2s;
 }
 
 .add-row-btn:hover {
-  background: var(--secondary-bg);
+  background: var(--secondary-bg, #1a1a1a);
   border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .notepad-footer {
-  padding: 1rem;
+  padding: 0.85rem 1rem;
   border-top: 1px solid var(--border-color);
   display: flex;
-  gap: 0.5rem;
-  background: var(--secondary-bg);
+  gap: 0.6rem;
+  background: var(--secondary-bg, #1a1a1a);
 }
 
 .action-btn {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.6rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  transition: opacity 0.2s, background 0.2s;
-}
-
-.action-btn:hover {
-  opacity: 0.9;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
 }
 
 .copy-btn {
@@ -276,31 +442,99 @@
 }
 
 .copy-btn:hover {
-  background: var(--bg-color);
-  filter: brightness(0.95);
-}
-
-.dark-theme .copy-btn:hover {
-  filter: brightness(1.2);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
 }
 
 .whatsapp-btn {
   background-color: #25D366 !important;
-  /* WhatsApp Official Green */
   color: #ffffff !important;
-  box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
 }
 
 .whatsapp-btn:hover {
-  background-color: #128c7e !important;
-  /* Slightly darker green on hover */
+  background-color: #1eb857 !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
 }
 
-/* Ensure icons are white */
 .whatsapp-btn svg {
   color: #ffffff !important;
+}
+
+/* Lightbox Preview Modal for Thumbnail Click */
+.notepad-image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+  padding: 1.5rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.notepad-image-modal-content {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1rem;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.notepad-image-modal-content img {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.notepad-image-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: var(--primary-color);
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.image-modal-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+}
+
+.view-full-link {
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-decoration: underline;
 }
 
 /* Mobile responsive adjustments */
@@ -311,7 +545,11 @@
   }
 
   .floating-btn {
-    width: 50px;
-    height: 50px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .notepad-modal {
+    width: calc(100vw - 2rem);
   }
 }

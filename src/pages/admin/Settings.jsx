@@ -108,6 +108,18 @@ const Settings = () => {
     } catch (err) { console.error('Error removing category:', err); }
   };
 
+  const toggleCategoryPro = async (cat) => {
+    try {
+      const nextPro = !cat.isPro;
+      await api.put(`/categories/${cat._id}`, { isPro: nextPro });
+      setCategories(prev => prev.map(c => c._id === cat._id ? { ...c, isPro: nextPro } : c));
+      setMessage(`Category "${cat.name}" updated to ${nextPro ? 'Pro Collection' : 'Non-Pro (Standard)'}`);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error('Error toggling category pro:', err);
+    }
+  };
+
   const removeSlider = (sliderToRemove) => {
     setExistingSliders(existingSliders.filter(s => s !== sliderToRemove));
   };
@@ -501,12 +513,103 @@ const Settings = () => {
 
           {/* Categories */}
           <div className="form-group">
-            <label>Manage Categories</label>
-             <div style={{display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px'}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '8px' }}>
+              <label style={{ margin: 0 }}>Manage Categories & Pro Collection Slider</label>
+              <small style={{ color: 'var(--text-muted, #888)' }}>Toggle the slider below each category to designate it for Pro or Non-Pro items.</small>
+            </div>
+             <div style={{display: 'flex', flexWrap: 'wrap', gap: '14px', marginBottom: '14px'}}>
                 {categories.map((cat, idx) => (
-                  <div key={idx} style={{display: 'flex', alignItems: 'center', background: 'var(--bg-color)', padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid var(--border-color)'}}>
-                    <span style={{marginRight: '10px', color: 'var(--text-color)'}}>{cat.name}</span>
-                    <button type="button" style={{background:'transparent', border:'none', color:'#f87171', cursor:'pointer'}} onClick={() => removeCategory(cat._id)}><Trash2 size={16}/></button>
+                  <div 
+                    key={idx} 
+                    style={{
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      background: 'var(--bg-color)', 
+                      padding: '0.6rem 0.9rem', 
+                      borderRadius: '8px', 
+                      border: `1px solid ${cat.isPro ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                      boxShadow: cat.isPro ? '0 0 10px rgba(212, 175, 55, 0.15)' : 'none',
+                      minWidth: '175px'
+                    }}
+                  >
+                    {/* Top Row: Category Name & Delete Option */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--text-color)', fontSize: '0.95rem' }}>
+                        {cat.name}
+                      </span>
+                      <button 
+                        type="button" 
+                        style={{background:'transparent', border:'none', color:'#f87171', cursor:'pointer', padding: '2px', display: 'flex', alignItems: 'center'}} 
+                        onClick={() => removeCategory(cat._id)}
+                        title="Delete Category"
+                      >
+                        <Trash2 size={16}/>
+                      </button>
+                    </div>
+
+                    {/* Below Delete Option: Slider for Pro and Non-Pro items */}
+                    <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted, #888)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Collection Slider:
+                        </span>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: cat.isPro ? 'var(--primary-color)' : 'var(--text-muted, #aaa)' }}>
+                          {cat.isPro ? '💎 Pro' : 'Non-Pro'}
+                        </span>
+                      </div>
+                      
+                      <div
+                        onClick={() => toggleCategoryPro(cat)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          background: cat.isPro ? 'rgba(212, 175, 55, 0.22)' : 'rgba(255, 255, 255, 0.08)',
+                          border: `1px solid ${cat.isPro ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                          borderRadius: '20px',
+                          padding: '2px',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          userSelect: 'none',
+                          height: '28px',
+                          transition: 'all 0.3s ease'
+                        }}
+                        title={`Click to switch between Non-Pro and Pro for ${cat.name}`}
+                      >
+                        <div style={{
+                          position: 'absolute',
+                          left: cat.isPro ? 'calc(50% + 1px)' : '2px',
+                          top: '2px',
+                          width: 'calc(50% - 3px)',
+                          height: '22px',
+                          background: cat.isPro ? 'var(--primary-color)' : '#555',
+                          borderRadius: '16px',
+                          transition: 'left 0.25s ease, background 0.25s ease',
+                          zIndex: 1
+                        }} />
+                        <span style={{
+                          flex: 1,
+                          textAlign: 'center',
+                          fontSize: '0.75rem',
+                          fontWeight: !cat.isPro ? 700 : 500,
+                          color: !cat.isPro ? '#fff' : 'var(--text-muted, #aaa)',
+                          zIndex: 2,
+                          transition: 'color 0.2s'
+                        }}>
+                          Non-Pro
+                        </span>
+                        <span style={{
+                          flex: 1,
+                          textAlign: 'center',
+                          fontSize: '0.75rem',
+                          fontWeight: cat.isPro ? 700 : 500,
+                          color: cat.isPro ? '#000' : 'var(--text-muted, #aaa)',
+                          zIndex: 2,
+                          transition: 'color 0.2s'
+                        }}>
+                          💎 Pro
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 ))}
              </div>
@@ -515,10 +618,10 @@ const Settings = () => {
                  type="text" 
                  value={newCategory} 
                  onChange={e => setNewCategory(e.target.value)} 
-                 placeholder="New Category Name" 
+                 placeholder="New Category Name (e.g. Bangles, Choker)" 
                />
                <button type="button" className="btn btn-outline" style={{display: 'flex', alignItems: 'center', gap: '5px'}} onClick={addCategory}>
-                 <Plus size={16} /> Add
+                 <Plus size={16} /> Add Category
                </button>
             </div>
           </div>

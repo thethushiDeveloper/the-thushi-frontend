@@ -191,6 +191,28 @@
   text-align: center;
 }
 
+.card-actions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-order-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  padding: 0.65rem 1rem;
+  transition: all 0.25s ease;
+}
+
+.add-order-btn.added {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+}
+
 @media screen and (max-width: 768px) {
   .catalog-filters {
     flex-direction: column;

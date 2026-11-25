@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Copy, Check } from 'lucide-react';
+import { Search, Copy, Check, ShoppingBag } from 'lucide-react';
+import { useNotepad } from '../context/NotepadContext';
 import api, { getImageUrl } from '../utils/api';
 import './Catalog.css';
 
@@ -12,11 +13,13 @@ let cachedCategory = '';
 let cachedScroll = 0;
 
 const Catalog = () => {
+  const { addToNotepad } = useNotepad();
   const [items, setItems] = useState(cachedItems);
   const [search, setSearch] = useState(cachedSearch);
   const [category, setCategory] = useState(cachedCategory);
   const [categories, setCategories] = useState(['Necklace', 'Ring', 'Bracelet', 'Earrings']);
   const [copiedId, setCopiedId] = useState(null);
+  const [addedId, setAddedId] = useState(null);
 
   const handleCopyItemNo = (e, itemNumber, itemId) => {
     e.preventDefault();
@@ -24,6 +27,14 @@ const Catalog = () => {
     navigator.clipboard.writeText(itemNumber);
     setCopiedId(itemId);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleAddToOrder = (e, item) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToNotepad(item, true);
+    setAddedId(item._id);
+    setTimeout(() => setAddedId(null), 2000);
   };
 
   const location = useLocation();
@@ -72,7 +83,9 @@ const Catalog = () => {
     try {
       const { data } = await api.get('/categories');
       if (data && data.length > 0) {
-        const catNames = data.map(c => c.name);
+        // Exclude strictly Pro categories from normal catalog
+        const nonProCats = data.filter(c => !c.isPro);
+        const catNames = (nonProCats.length > 0 ? nonProCats : data).map(c => c.name);
         setCategories(catNames);
 
         const params = new URLSearchParams(location.search);
@@ -88,9 +101,9 @@ const Catalog = () => {
 
   const fetchItems = async () => {
     try {
-      let query = '?';
-      if (search) query += `search=${search}&`;
-      if (category) query += `category=${category}`;
+      let query = '?isPro=false&';
+      if (search) query += `search=${encodeURIComponent(search)}&`;
+      if (category) query += `category=${encodeURIComponent(category)}`;
       const { data } = await api.get(`/items${query}`);
       setItems(data);
     } catch (error) {
@@ -167,9 +180,26 @@ const Catalog = () => {
                 </span>
                 <p className="weight-range" style={{ fontSize: '0.9rem', color: 'var(--text-color)', opacity: 0.8, marginBottom: '0.2rem' }}>Weight: {item.weightRange}</p>
                 <p className="weight-range" style={{ fontSize: '0.9rem', color: 'var(--text-color)', opacity: 0.8, marginBottom: '1rem' }}>Metal: {item.metal || 'Gold'}</p>
-                <Link to={`/item/${item._id}`} className="btn btn-outline full-width">
-                  View Details
-                </Link>
+                <div className="card-actions-stack">
+                  <Link to={`/item/${item._id}`} className="btn btn-outline full-width">
+                    View Details
+                  </Link>
+                  <button
+                    type="button"
+                    className={`btn btn-primary full-width add-order-btn ${addedId === item._id ? 'added' : ''}`}
+                    onClick={(e) => handleAddToOrder(e, item)}
+                  >
+                    {addedId === item._id ? (
+                      <>
+                        <Check size={16} /> Added to Order!
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag size={16} /> Add for Order
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))

@@ -1,18 +1,43 @@
 import axios from 'axios';
 
-export const BASE_URL = import.meta.env.VITE_API_URL
-  ? import.meta.env.VITE_API_URL.replace('/api', '')
-  : 'https://the-thushi-api.onrender.com';
+// Detect whether running in local development environment
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-// Smart image URL helper - handles both Cloudinary absolute URLs and legacy local paths
+// Determine base API endpoint
+const getBaseApiUrl = () => {
+  // If explicitly provided via VITE_API_URL and not a localhost override in production
+  if (import.meta.env.VITE_API_URL) {
+    if (!isLocalhost && import.meta.env.VITE_API_URL.includes('localhost')) {
+      // In production environment, do not use localhost
+      return 'https://the-thushi-api.onrender.com/api';
+    }
+    return import.meta.env.VITE_API_URL;
+  }
+  // If running locally in browser
+  if (isLocalhost) {
+    return 'http://localhost:5000/api';
+  }
+  // Production fallback on Render/Vercel
+  return 'https://the-thushi-api.onrender.com/api';
+};
+
+const getBaseHostUrl = () => {
+  const apiUrl = getBaseApiUrl();
+  return apiUrl.replace(/\/api\/?$/, '');
+};
+
+export const BASE_URL = getBaseHostUrl();
+
+// Smart image URL helper - handles Cloudinary, full URLs, and relative paths
 export const getImageUrl = (path) => {
   if (!path) return '';
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  return `${BASE_URL}${path}`;
+  return `${BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
 };
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://the-thushi-api.onrender.com/api',
+  baseURL: getBaseApiUrl(),
 });
 
 api.interceptors.request.use((config) => {
