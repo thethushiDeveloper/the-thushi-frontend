@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { 
   Sparkles, Lock, KeyRound, User, ChevronLeft, ChevronRight, 
   Search, Copy, Check, ShoppingBag, LogOut, ArrowRight, X, 
-  Layers, Gem, Award, ShieldCheck, Eye, EyeOff, Store, Phone
+  Layers, Gem, Award, ShieldCheck, Eye, EyeOff, Store, Phone,
+  PackageCheck
 } from 'lucide-react';
 import { useNotepad } from '../context/NotepadContext';
 import api, { getImageUrl } from '../utils/api';
@@ -35,6 +36,7 @@ const ProCollection = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('category'); // 'category' (grouped) or 'grid'
+  const [onlyAvailableStock, setOnlyAvailableStock] = useState(false); // Toggle "Available Stock"
 
   // Settings & Ad Slides State
   const [settings, setSettings] = useState(null);
@@ -87,8 +89,8 @@ const ProCollection = () => {
 
   const fetchProItems = async () => {
     try {
-      // Query pro items explicitly
-      const { data } = await api.get('/items?isPro=true');
+      // Query pro items and any in-stock standard items for Pro Collection members
+      const { data } = await api.get('/items?forPro=true');
       setItems(data || []);
     } catch (err) {
       console.error('Failed to load pro items:', err);
@@ -112,8 +114,8 @@ const ProCollection = () => {
       setJeweller(data);
       window.dispatchEvent(new Event('jewellerAuthChange'));
 
-      // Fetch pro collection data immediately
-      const itemsRes = await api.get('/items?isPro=true');
+      // Fetch pro collection data immediately (including in-stock items)
+      const itemsRes = await api.get('/items?forPro=true');
       setItems(itemsRes.data || []);
       const catsRes = await api.get('/categories');
       setCategories(catsRes.data || []);
@@ -154,6 +156,11 @@ const ProCollection = () => {
 
   // Filter and sort items
   const filteredItems = items.filter(item => {
+    // Available Stock toggle: if ON, only show ready-made available items
+    if (onlyAvailableStock && !item.inStock) {
+      return false;
+    }
+
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.itemNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.category && item.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -502,10 +509,10 @@ const ProCollection = () => {
           onClick={() => setSelectedCategory('all')}
         >
           <span>All Pro Items</span>
-          <span className="pro-cat-count">{items.length}</span>
+          <span className="pro-cat-count">{onlyAvailableStock ? items.filter(i => i.inStock).length : items.length}</span>
         </button>
         {categories.map((cat, idx) => {
-          const count = items.filter(i => i.category === cat.name).length;
+          const count = items.filter(i => i.category === cat.name && (!onlyAvailableStock || i.inStock)).length;
           return (
             <button
               key={idx}
@@ -532,6 +539,30 @@ const ProCollection = () => {
           />
         </div>
 
+        {/* Toggle Button for Available Stock (Only for Pro Collection members) */}
+        <div className="pro-stock-toggle-wrap">
+          <button
+            type="button"
+            className={`pro-stock-toggle-btn ${onlyAvailableStock ? 'active' : ''}`}
+            onClick={() => setOnlyAvailableStock(prev => !prev)}
+            title={onlyAvailableStock ? "Showing ready-made available stock only. Click to show all designs." : "Click to view ready-made available stock items only."}
+          >
+            <div className="stock-toggle-switch">
+              <span className="stock-toggle-thumb" />
+            </div>
+            <div className="stock-toggle-label">
+              <span className="stock-toggle-title">
+                <PackageCheck size={16} /> Available Stock
+              </span>
+              <span className="stock-toggle-sub">
+                {onlyAvailableStock 
+                  ? `Showing Ready Items (${items.filter(i => i.inStock).length})` 
+                  : `Show Ready Items Only`}
+              </span>
+            </div>
+          </button>
+        </div>
+
         <div className="pro-sort-box">
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
             <option value="newest">Sort by: Newest Arrivals</option>
@@ -541,14 +572,57 @@ const ProCollection = () => {
         </div>
       </div>
 
+      {/* Available Stock Active Notice Banner */}
+      {onlyAvailableStock && (
+        <div className="pro-stock-notice-bar animate-fade-in">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <PackageCheck size={18} color="#22c55e" />
+            <span>
+              <strong>Available Stock filter is ON:</strong> Showing only ready-made items currently in stock ({filteredItems.length} found).
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOnlyAvailableStock(false)}
+            style={{
+              background: 'transparent',
+              border: '1px solid rgba(34, 197, 94, 0.6)',
+              borderRadius: '20px',
+              color: '#22c55e',
+              padding: '0.25rem 0.75rem',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Show All Designs
+          </button>
+        </div>
+      )}
+
       {/* ─── CATALOG DISPLAY: CATEGORY-WISE OR UNIFIED GRID ─── */}
       {filteredItems.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 2rem', background: 'var(--card-bg)', borderRadius: '12px', border: '1px dashed var(--border-color)' }}>
           <Sparkles size={48} style={{ color: 'var(--primary-color)', opacity: 0.6, marginBottom: '1rem' }} />
-          <h3>No Pro Items Found Matching Your Search</h3>
-          <p style={{ color: 'var(--text-muted, #888)' }}>
-            Try selecting another category or clear your search term.
+          <h3>
+            {onlyAvailableStock 
+              ? 'No Ready Stock Items Found' 
+              : 'No Pro Items Found Matching Your Search'}
+          </h3>
+          <p style={{ color: 'var(--text-muted, #888)', maxWidth: '500px', margin: '0 auto 1.5rem' }}>
+            {onlyAvailableStock
+              ? 'There are currently no ready-made items in stock matching your current filters. Turn off "Available Stock" to explore all custom made-to-order designs.'
+              : 'Try selecting another category or clear your search term.'}
           </p>
+          {onlyAvailableStock && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setOnlyAvailableStock(false)}
+            >
+              Turn Off Available Stock & View All Designs
+            </button>
+          )}
         </div>
       ) : viewMode === 'category' && selectedCategory === 'all' ? (
         /* Category-Wise Grouped Display */
@@ -574,9 +648,20 @@ const ProCollection = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: Math.min(itemIdx * 0.04, 0.4) }}
                   >
-                    <span className="pro-card-badge">
-                      <Sparkles size={12} /> PRO EXCLUSIVE
-                    </span>
+                    {item.isPro ? (
+                      <span className="pro-card-badge">
+                        <Sparkles size={12} /> PRO EXCLUSIVE
+                      </span>
+                    ) : (
+                      <span className="pro-card-badge" style={{ background: 'linear-gradient(135deg, #15803d, #166534)', color: '#fff' }}>
+                        <PackageCheck size={12} /> AVAILABLE IN STOCK
+                      </span>
+                    )}
+                    {item.inStock && (
+                      <span className="pro-card-stock-pill" title="Ready made item available in stock">
+                        <PackageCheck size={12} /> Ready Stock
+                      </span>
+                    )}
 
                     <div 
                       className="pro-card-img-wrap"
@@ -612,6 +697,14 @@ const ProCollection = () => {
                       <div className="pro-card-specs">
                         <span><strong>Weight:</strong> {item.weightRange}</span>
                         <span><strong>Metal:</strong> {item.metal || 'Gold'}</span>
+                        <span>
+                          <strong>Stock:</strong>{' '}
+                          {item.inStock ? (
+                            <span style={{ color: '#22c55e', fontWeight: 700 }}>Ready in Stock</span>
+                          ) : (
+                            <span style={{ color: 'var(--text-muted, #888)' }}>Made to Order</span>
+                          )}
+                        </span>
                       </div>
 
                       <div className="pro-card-actions">
@@ -648,9 +741,20 @@ const ProCollection = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: Math.min(itemIdx * 0.04, 0.4) }}
             >
-              <span className="pro-card-badge">
-                <Sparkles size={12} /> PRO EXCLUSIVE
-              </span>
+              {item.isPro ? (
+                <span className="pro-card-badge">
+                  <Sparkles size={12} /> PRO EXCLUSIVE
+                </span>
+              ) : (
+                <span className="pro-card-badge" style={{ background: 'linear-gradient(135deg, #15803d, #166534)', color: '#fff' }}>
+                  <PackageCheck size={12} /> AVAILABLE IN STOCK
+                </span>
+              )}
+              {item.inStock && (
+                <span className="pro-card-stock-pill" title="Ready made item available in stock">
+                  <PackageCheck size={12} /> Ready Stock
+                </span>
+              )}
 
               <div 
                 className="pro-card-img-wrap"
@@ -686,6 +790,14 @@ const ProCollection = () => {
                 <div className="pro-card-specs">
                   <span><strong>Weight:</strong> {item.weightRange}</span>
                   <span><strong>Metal:</strong> {item.metal || 'Gold'}</span>
+                  <span>
+                    <strong>Stock:</strong>{' '}
+                    {item.inStock ? (
+                      <span style={{ color: '#22c55e', fontWeight: 700 }}>Ready in Stock</span>
+                    ) : (
+                      <span style={{ color: 'var(--text-muted, #888)' }}>Made to Order</span>
+                    )}
+                  </span>
                 </div>
 
                 <div className="pro-card-actions">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Edit3, ImagePlus, X, Eye, EyeOff, Sparkles, Filter } from 'lucide-react';
+import { Trash2, Edit3, ImagePlus, X, Eye, EyeOff, Sparkles, Filter, PackageCheck } from 'lucide-react';
 import api, { getImageUrl } from '../../utils/api';
 import './Admin.css';
 
@@ -14,7 +14,8 @@ const ManageItems = () => {
     weightRange: '', 
     category: 'General', 
     metal: 'Gold',
-    isPro: false
+    isPro: false,
+    inStock: false
   });
   const [images, setImages] = useState(null);
   const [existingImages, setExistingImages] = useState([]);
@@ -96,7 +97,8 @@ const ManageItems = () => {
         weightRange: '', 
         category: categories[0] || 'General', 
         metal: 'Gold',
-        isPro: false
+        isPro: false,
+        inStock: false
       });
       setImages(null);
       setExistingImages([]);
@@ -119,7 +121,8 @@ const ManageItems = () => {
       weightRange: item.weightRange, 
       category: item.category || (categories[0] || 'General'), 
       metal: item.metal || 'Gold',
-      isPro: item.isPro || false
+      isPro: item.isPro || false,
+      inStock: item.inStock || false
     });
     setExistingImages(item.images || []);
     setImagesToRemove([]);
@@ -172,6 +175,21 @@ const ManageItems = () => {
     }
   };
 
+  const toggleStockItem = async (item) => {
+    try {
+      const newStockStatus = !item.inStock;
+      const data = new FormData();
+      data.append('inStock', newStockStatus);
+      await api.put(`/items/${item._id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setMessage(`Item #${item.itemNumber} marked as ${newStockStatus ? 'In Stock (Available)' : 'Out of Stock / Made to Order'}`);
+      fetchItems();
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      setMessage('Error updating item stock status');
+      console.error('Failed to toggle stock status');
+    }
+  };
+
   const filteredItems = items.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       item.itemNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -180,6 +198,7 @@ const ManageItems = () => {
     if (!matchesSearch) return false;
     if (collectionFilter === 'pro') return item.isPro === true;
     if (collectionFilter === 'standard') return !item.isPro;
+    if (collectionFilter === 'stock') return item.inStock === true;
     return true;
   });
 
@@ -303,6 +322,79 @@ const ManageItems = () => {
             </small>
           </div>
 
+          {/* Toggle for In Stock / Available Stock Item */}
+          <div className="form-group" style={{ 
+            background: 'var(--bg-color)', 
+            padding: '1rem', 
+            borderRadius: '8px', 
+            border: `1px solid ${formData.inStock ? '#22c55e' : 'var(--border-color)'}`,
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+              <label style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <PackageCheck size={18} style={{ color: formData.inStock ? '#22c55e' : 'var(--text-muted, #888)' }} />
+                <span>Stock Availability (Available Stock)</span>
+              </label>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: formData.inStock ? '#22c55e' : 'var(--text-muted, #aaa)' }}>
+                {formData.inStock ? '✓ In Stock (Already Made)' : '○ Made to Order / Out of Stock'}
+              </span>
+            </div>
+
+            <div
+              onClick={() => setFormData(prev => ({ ...prev, inStock: !prev.inStock }))}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: formData.inStock ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                border: `1px solid ${formData.inStock ? '#22c55e' : 'var(--border-color)'}`,
+                borderRadius: '24px',
+                padding: '3px',
+                cursor: 'pointer',
+                position: 'relative',
+                userSelect: 'none',
+                height: '36px',
+                maxWidth: '320px',
+                transition: 'all 0.3s ease'
+              }}
+              title="Click to toggle stock availability"
+            >
+              <div style={{
+                position: 'absolute',
+                left: formData.inStock ? 'calc(50% + 2px)' : '3px',
+                top: '3px',
+                width: 'calc(50% - 5px)',
+                height: '28px',
+                background: formData.inStock ? '#22c55e' : '#666',
+                borderRadius: '20px',
+                transition: 'left 0.25s ease, background 0.25s ease',
+                zIndex: 1
+              }} />
+              <span style={{
+                flex: 1,
+                textAlign: 'center',
+                fontSize: '0.85rem',
+                fontWeight: !formData.inStock ? 700 : 500,
+                color: !formData.inStock ? '#fff' : 'var(--text-muted, #aaa)',
+                zIndex: 2
+              }}>
+                Made to Order
+              </span>
+              <span style={{
+                flex: 1,
+                textAlign: 'center',
+                fontSize: '0.85rem',
+                fontWeight: formData.inStock ? 700 : 500,
+                color: formData.inStock ? '#000' : 'var(--text-muted, #aaa)',
+                zIndex: 2
+              }}>
+                📦 In Stock
+              </span>
+            </div>
+            <small style={{ color: 'var(--text-muted, #888)', display: 'block', marginTop: '6px' }}>
+              Items marked as "In Stock" appear immediately when Pro Collection members switch on the "Available Stock" toggle.
+            </small>
+          </div>
+
           <div className="form-group">
             <label>Description</label>
             <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3"></textarea>
@@ -325,7 +417,7 @@ const ManageItems = () => {
             {editingId ? 'Update Item' : 'Add Item'}
           </button>
           {editingId && (
-            <button type="button" className="btn btn-outline" style={{marginLeft: '10px'}} onClick={() => {setEditingId(null); setExistingImages([]); setImagesToRemove([]); setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold', isPro: false });}}>
+            <button type="button" className="btn btn-outline" style={{marginLeft: '10px'}} onClick={() => {setEditingId(null); setExistingImages([]); setImagesToRemove([]); setFormData({ itemNumber: '', name: '', description: '', weightRange: '', category: categories[0] || 'General', metal: 'Gold', isPro: false, inStock: false });}}>
               Cancel
             </button>
           )}
@@ -337,13 +429,13 @@ const ManageItems = () => {
           <div>
             <h2>Current Catalog Items ({filteredItems.length})</h2>
             <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted, #888)' }}>
-              Click the collection badge to toggle an item between Standard and Pro collection.
+              Click the collection or stock badge to toggle between Standard/Pro and In Stock/Out of Stock.
             </p>
           </div>
           
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-            {/* Filter by collection */}
-            <div style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '6px', border: '1px solid var(--border-color)', padding: '2px' }}>
+            {/* Filter by collection and stock */}
+            <div style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '6px', border: '1px solid var(--border-color)', padding: '2px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={() => setCollectionFilter('all')}
@@ -392,6 +484,22 @@ const ManageItems = () => {
               >
                 💎 Pro ({items.filter(i => i.isPro).length})
               </button>
+              <button
+                type="button"
+                onClick={() => setCollectionFilter('stock')}
+                style={{
+                  padding: '0.35rem 0.75rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  background: collectionFilter === 'stock' ? '#22c55e' : 'transparent',
+                  color: collectionFilter === 'stock' ? '#000' : 'var(--text-color)',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
+              >
+                📦 Is Stock ({items.filter(i => i.inStock).length})
+              </button>
             </div>
 
             <input 
@@ -414,6 +522,7 @@ const ManageItems = () => {
                 <th>Weight</th>
                 <th>Category</th>
                 <th>Collection Type</th>
+                <th>Stock Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -450,6 +559,31 @@ const ManageItems = () => {
                     >
                       <Sparkles size={13} />
                       {item.isPro ? 'PRO Item' : 'Standard'}
+                    </button>
+                  </td>
+                  <td>
+                    {/* 1-click Stock Status Toggle Button */}
+                    <button
+                      type="button"
+                      onClick={() => toggleStockItem(item)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '0.3rem 0.7rem',
+                        borderRadius: '20px',
+                        border: `1px solid ${item.inStock ? '#22c55e' : 'var(--border-color)'}`,
+                        background: item.inStock ? 'rgba(34, 197, 94, 0.2)' : 'var(--bg-color)',
+                        color: item.inStock ? '#22c55e' : 'var(--text-muted, #aaa)',
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      title="Click to toggle Available Stock (In Stock / Out of Stock)"
+                    >
+                      <PackageCheck size={13} />
+                      {item.inStock ? 'In Stock' : 'Out of Stock'}
                     </button>
                   </td>
                   <td>

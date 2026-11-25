@@ -749,3 +749,126 @@
   border-color: var(--primary-color);
   color: var(--primary-color);
 }
+
+/* ─── Available Stock Luxury Toggle Button in Pro Collection ─── */
+.pro-stock-toggle-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.pro-stock-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 1.1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  text-align: left;
+}
+
+.pro-stock-toggle-btn:hover {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.pro-stock-toggle-btn.active {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #22c55e;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.25);
+}
+
+.stock-toggle-switch {
+  width: 44px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  position: relative;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+.pro-stock-toggle-btn.active .stock-toggle-switch {
+  background: #22c55e;
+}
+
+.stock-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.pro-stock-toggle-btn.active .stock-toggle-thumb {
+  transform: translateX(20px);
+}
+
+.stock-toggle-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.stock-toggle-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.pro-stock-toggle-btn.active .stock-toggle-title {
+  color: #22c55e;
+}
+
+.stock-toggle-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted, #888);
+  font-weight: 500;
+}
+
+.pro-stock-toggle-btn.active .stock-toggle-sub {
+  color: rgba(34, 197, 94, 0.9);
+}
+
+/* Stock Badges on Cards */
+.pro-card-stock-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #15803d;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.28rem 0.65rem;
+  border-radius: 20px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.pro-stock-notice-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+  font-size: 0.92rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}

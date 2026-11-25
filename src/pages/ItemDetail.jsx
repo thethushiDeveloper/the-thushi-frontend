@@ -144,6 +144,14 @@ const ItemDetail = () => {
             <p className="weight"><strong>Weight Range:</strong> {item.weightRange}</p>
             <p className="category"><strong>Category:</strong> {item.category}</p>
             <p className="category"><strong>Metal:</strong> {item.metal || 'Gold'}</p>
+            <p className="category">
+              <strong>Stock Status:</strong>{' '}
+              {item.inStock ? (
+                <span style={{ color: '#22c55e', fontWeight: 700 }}>✓ Available in Stock (Ready to Deliver)</span>
+              ) : (
+                <span style={{ color: 'var(--text-muted, #aaa)' }}>Made to Order</span>
+              )}
+            </p>
           </div>
 
           <div className="description">
