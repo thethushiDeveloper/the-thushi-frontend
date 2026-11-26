@@ -32,8 +32,13 @@ export const BASE_URL = getBaseHostUrl();
 // Smart image URL helper - handles Cloudinary, full URLs, and relative paths
 export const getImageUrl = (path) => {
   if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  return `${BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+  if (typeof path !== 'string') return '';
+  const trimmed = path.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+  const normalized = trimmed.replace(/\\/g, '/');
+  return `${BASE_URL}${normalized.startsWith('/') ? '' : '/'}${normalized}`;
 };
 
 const api = axios.create({
