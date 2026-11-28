@@ -183,6 +183,9 @@
 .action-btn.edit { color: #4dabf7; }
 .action-btn.edit:hover { color: #228be6; }
 
+.action-btn.whatsapp { color: #25D366; }
+.action-btn.whatsapp:hover { color: #1ebe5d; }
+
 .action-btn.delete { color: #ff6b6b; }
 .action-btn.delete:hover { color: #fa5252; }
 

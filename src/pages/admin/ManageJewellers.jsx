@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   Users, Plus, Trash2, Edit3, Eye, EyeOff, Copy, Check, 
-  ArrowLeft, Search, ShieldCheck, KeyRound, Phone, MapPin, Building
+  ArrowLeft, Search, ShieldCheck, KeyRound, Phone, MapPin, Building, MessageCircle
 } from 'lucide-react';
 import api from '../../utils/api';
 import './Admin.css';
@@ -40,7 +40,12 @@ const ManageJewellers = () => {
       setJewellers(data);
     } catch (err) {
       console.error('Failed to fetch jewellers:', err);
-      setError('Could not load jewellers list.');
+      if (err.response?.status === 401) {
+        localStorage.removeItem('adminToken');
+        navigate('/admin/login');
+        return;
+      }
+      setError(err.response?.data?.message || 'Could not load jewellers list.');
     }
   };
 
@@ -97,12 +102,14 @@ const ManageJewellers = () => {
     } catch (err) {
       console.error('Error saving jeweller:', err);
       let errMsg = 'Failed to save jeweller. Please verify inputs.';
-      if (err.response?.data?.message) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem('adminToken');
+        navigate('/admin/login');
+        return;
+      } else if (err.response?.data?.message) {
         errMsg = err.response.data.message;
       } else if (err.response?.status === 404) {
         errMsg = 'API endpoint not found (404). Please ensure the backend server is running and up-to-date.';
-      } else if (err.response?.status === 401) {
-        errMsg = 'Admin session expired or unauthorized. Please re-login to Admin Dashboard.';
       } else if (err.message) {
         errMsg = err.message;
       }
@@ -132,7 +139,12 @@ const ManageJewellers = () => {
         fetchJewellers();
         setTimeout(() => setMessage(''), 3000);
       } catch (err) {
-        setError('Failed to delete jeweller.');
+        if (err.response?.status === 401) {
+          localStorage.removeItem('adminToken');
+          navigate('/admin/login');
+          return;
+        }
+        setError(err.response?.data?.message || 'Failed to delete jeweller.');
       }
     }
   };
@@ -147,6 +159,19 @@ const ManageJewellers = () => {
       password: '',
       status: 'active'
     });
+  };
+
+  const handleSendWhatsApp = (jeweller) => {
+    let phoneNum = (jeweller.mobile || '').replace(/[^0-9]/g, '');
+    if (!phoneNum.startsWith('91') && phoneNum.length === 10) {
+      phoneNum = `91${phoneNum}`;
+    }
+
+    const text = `Hey ${jeweller.name}, Your Registration in The Thushi's Pro Collection is successfully done.\n\nThis is your Login ID - ${jeweller.loginId}\nPassword - ${jeweller.rawPassword || ''}`;
+    const url = phoneNum
+      ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const filteredJewellers = jewellers.filter(j => 
@@ -426,7 +451,15 @@ const ManageJewellers = () => {
                         </span>
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <button 
+                            type="button"
+                            className="action-btn whatsapp" 
+                            onClick={() => handleSendWhatsApp(jeweller)} 
+                            title="Send Login ID & Password on WhatsApp"
+                          >
+                            <MessageCircle size={18} />
+                          </button>
                           <button 
                             className="action-btn edit" 
                             onClick={() => handleEdit(jeweller)} 
